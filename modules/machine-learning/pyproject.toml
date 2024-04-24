@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "machine-learning"
+version = "0.1.0"
+description = "machine learning service that process the machine learning algorithm, doing machine learning task"
+authors = ["TuanCR <tuancr.pt@gmail.com>"]
+readme = "README.md"
+packages = [{include = "machine_learning"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+dinohub-seedwork-be = "^0.1.56"
+returns = "0.20.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
