@@ -14,6 +14,11 @@ class CommandType(Enum):
     DOWNLOAD = "DOWNLOAD"
 
 
+@safe
+def parse_command_type(v: str):
+    return CommandType(v)
+
+
 ### FILE input value object
 @dataclass()
 class FileInput:

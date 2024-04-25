@@ -1,6 +1,6 @@
 from typing import Dict, List, Set, final
 from dino_seedwork_be import collect_fresult, collect_result
-from returns.future import FutureResult
+from returns.future import FutureResult, FutureResultE
 from returns.iterables import Fold
 from event_broker_base import DomainEvent, EventBroker, SubscriberHandler
 

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 import uuid
 from returns.maybe import Maybe, Some
-from returns.result import Result, ResultE
+from returns.result import Result, ResultE, Success, safe
 from returns.future import future_safe
 import random
 
@@ -14,6 +14,7 @@ from models.command import (
     CommandType,
     OtherwiseInput,
     PredictInput,
+    parse_command_type,
     parse_otherwise_input,
     parse_predict_input_from_json,
 )
@@ -24,6 +25,11 @@ class Status(Enum):
     PROCESSING = "PROCESSING"
     FINISH = "FINISH"
     PENDING = "PENDING"
+
+
+@safe
+def parse_status(v: str):
+    return Status(v)
 
 
 @dataclass()
@@ -72,14 +78,21 @@ def parse_task(
     result: Maybe[str],
     raw_input: str,
 ) -> ResultE[Task]:
-    match [command, status, fail_reason, result]:
-        case [CommandType() as c, Status.PROCESSING, Maybe.empty, Maybe.empty]:
+    domain_command = parse_command_type(command)
+    domain_status = parse_status(status)
+    match [domain_command, domain_status, fail_reason, result]:
+        case [
+            Success(c),
+            Success(Status.PROCESSING | Status.PENDING),
+            Maybe.empty,
+            Maybe.empty,
+        ]:
             return parse_input_per_se_command(c, raw_input).map(
                 lambda input: Task(
-                    id, c, Status.PROCESSING, Maybe.empty, Maybe.empty, input
+                    id, c, domain_status.unwrap(), Maybe.empty, Maybe.empty, input
                 )
             )
-        case [CommandType() as c, Status.FAILED, Some(raw_reason), Maybe.empty]:
+        case [Success(c), Success(Status.FAILED), Some(raw_reason), Maybe.empty]:
             return Result.do(
                 Task(
                     id=id,
@@ -92,7 +105,7 @@ def parse_task(
                 for input in parse_input_per_se_command(c, raw_input)
                 for r in parse_reason(raw_reason)
             )
-        case [CommandType() as c, Status.FINISH, Maybe.empty, Some(raw_result)]:
+        case [Success(c), Success(Status.FINISH), Maybe.empty, Some(raw_result)]:
             return Result.do(
                 Task(
                     id=id,
@@ -106,7 +119,11 @@ def parse_task(
                 for r in parse_result(raw_result)
             )
         case _:
-            return Result.from_failure(Exception("task is not in correct status"))
+            return Result.from_failure(
+                Exception(
+                    f"task is not in correct status: command-{domain_command}, status={domain_status}, fail_reason={fail_reason}, result={result}"
+                )
+            )
 
 
 def clone_task(task: Task):

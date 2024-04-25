@@ -1,10 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, Generic, List, TypeVar, Union
+from typing import Generic, List, TypeVar
 
-from returns.functions import tap
 from returns.future import FutureResultE
-from returns.pipeline import flow
 
 EventProps = TypeVar("EventProps")
 
