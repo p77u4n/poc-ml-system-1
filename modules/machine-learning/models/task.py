@@ -1,10 +1,14 @@
 from dataclasses import dataclass
 from enum import Enum
+import uuid
 from returns.maybe import Maybe, Some
 from returns.result import Result, ResultE
+from returns.future import future_safe
+import random
 
 # from returns.result import ResultE
 
+from event_broker_base import DomainEvent
 from models.command import (
     CommandInput,
     CommandType,
@@ -19,6 +23,7 @@ class Status(Enum):
     FAILED = "FAILED"
     PROCESSING = "PROCESSING"
     FINISH = "FINISH"
+    PENDING = "PENDING"
 
 
 @dataclass()
@@ -41,6 +46,7 @@ def parse_result(value) -> ResultE[RunningResult]:
 
 @dataclass()
 class Task:
+    id: uuid.UUID
     command: CommandType
     status: Status
     fail_reason: Maybe[FailReason]
@@ -59,6 +65,7 @@ def parse_input_per_se_command(
 
 
 def parse_task(
+    id: uuid.UUID,
     command: str,
     status: str,
     fail_reason: Maybe[str],
@@ -69,12 +76,13 @@ def parse_task(
         case [CommandType() as c, Status.PROCESSING, Maybe.empty, Maybe.empty]:
             return parse_input_per_se_command(c, raw_input).map(
                 lambda input: Task(
-                    c, Status.PROCESSING, Maybe.empty, Maybe.empty, input
+                    id, c, Status.PROCESSING, Maybe.empty, Maybe.empty, input
                 )
             )
         case [CommandType() as c, Status.FAILED, Some(raw_reason), Maybe.empty]:
             return Result.do(
                 Task(
+                    id=id,
                     command=c,
                     status=Status.FAILED,
                     fail_reason=Maybe.from_value(r),
@@ -87,6 +95,7 @@ def parse_task(
         case [CommandType() as c, Status.FINISH, Maybe.empty, Some(raw_result)]:
             return Result.do(
                 Task(
+                    id=id,
                     command=c,
                     status=Status.FAILED,
                     fail_reason=Maybe.empty,
@@ -98,3 +107,58 @@ def parse_task(
             )
         case _:
             return Result.from_failure(Exception("task is not in correct status"))
+
+
+def clone_task(task: Task):
+    return Task(
+        id=task.id,
+        command=task.command,
+        result=task.result,
+        fail_reason=task.fail_reason,
+        input=task.input,
+        status=task.status,
+    )
+
+
+class Events(Enum):
+    TASK_FINISH = "TASK_FINISH"
+    TASK_FAILED = "TASK_FAILED"
+    TASK_START = "TASK_START"
+
+
+def start_task(task: Task):
+    isPending = task.status == Status.PENDING
+    if isPending is False:
+        return Result.from_failure(Exception("CANNOT_START_A_NON_PENDING_TASK"))
+    else:
+        updated_task = clone_task(task)
+        updated_task.status = Status.PROCESSING
+        return Result.from_value(
+            [updated_task, [DomainEvent(Events.TASK_START.value, {"task": task})]]
+        )
+
+
+@future_safe
+async def running_task(task: Task):
+    # machine learning algorithm main process be put at here
+    is_failed = bool(random.randint(0, 1))
+    updated_task = clone_task(task)
+    match is_failed:
+        case True:
+            updated_task.result = Maybe.from_value(
+                parse_result("OK").unwrap()
+            )  # panic here
+            updated_task.status = Status.FINISH
+            return [
+                updated_task,
+                [DomainEvent(Events.TASK_FINISH.value, {"task": updated_task})],
+            ]
+        case False:
+            updated_task.fail_reason = Maybe.from_value(
+                parse_reason("FAILED").unwrap()
+            )  # panic here true
+            updated_task.status = Status.FAILED
+            return [
+                updated_task,
+                [DomainEvent(Events.TASK_FAILED.value, {"task": updated_task})],
+            ]

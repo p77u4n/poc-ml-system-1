@@ -10,6 +10,7 @@ packages = [{include = "machine_learning"}]
 python = "^3.10"
 dinohub-seedwork-be = "^0.1.56"
 returns = "0.20.0"
+multimethod = "^1.11.2"
 
 
 [build-system]
