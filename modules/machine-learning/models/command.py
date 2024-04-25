@@ -45,6 +45,9 @@ class OtherwiseInput(FileInput):
     pass
 
 
+CommandInput = OtherwiseInput | PredictInput
+
+
 def parse_predict_input_from_json(json_str: str) -> ResultE[PredictInput]:
     # logic parse predict_input valueobject from json
     @safe
