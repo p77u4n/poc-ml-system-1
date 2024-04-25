@@ -5,7 +5,6 @@ from returns.functions import tap
 from returns.future import FutureResultE
 from returns.io import IOFailure, IOSuccess
 from returns.maybe import Some
-from returns.pipeline import flow, pipe
 from returns.result import Failure, Success
 from config import ServiceConfig
 from event_broker_base import EventBroker

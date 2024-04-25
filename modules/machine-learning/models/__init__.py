@@ -1,4 +1,4 @@
-from typing import Any, List, TypeVar, Union
+from typing import List, TypeVar, Union
 
 from event_broker_base import DomainEvent
 

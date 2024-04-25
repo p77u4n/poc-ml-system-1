@@ -11,6 +11,8 @@ python = "^3.10"
 dinohub-seedwork-be = "^0.1.56"
 returns = "0.20.0"
 multimethod = "^1.11.2"
+sqlalchemy = "1.4.52"
+alembic = "^1.13.1"
 
 
 [tool.poetry.group.dev.dependencies]

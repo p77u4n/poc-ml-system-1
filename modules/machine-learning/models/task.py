@@ -18,6 +18,7 @@ from models.command import (
     parse_otherwise_input,
     parse_predict_input_from_json,
 )
+from models.task_events import Events
 
 
 class Status(Enum):
@@ -135,12 +136,6 @@ def clone_task(task: Task):
         input=task.input,
         status=task.status,
     )
-
-
-class Events(Enum):
-    TASK_FINISH = "TASK_FINISH"
-    TASK_FAILED = "TASK_FAILED"
-    TASK_START = "TASK_START"
 
 
 def start_task(task: Task):

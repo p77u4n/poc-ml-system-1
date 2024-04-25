@@ -1,0 +1,37 @@
+version: '3.3'
+
+services:
+  node-service:
+    image: tuancr/poc-node-service:latest
+    stdin_open: true
+    tty: true
+    env_file:
+      - ./deploy/.node-gateway.env
+    networks:
+      - poc-network 
+    restart: always
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    volumes:
+      - './deploy/rabbitmq/data/:/var/lib/rabbitmq/mnesia/'
+      - './deploy/rabbitmq/init/:/var/lib/rabbitmq/init/'
+    env_file:
+      - ./deploy/rabbitmq/.example.env
+    command: sh /var/lib/rabbitmq/init/init.sh
+    networks:
+      - poc-network
+  poc-machine-learning-consumer:
+    restart: always
+    image: tuancr/poc-machine-learning-service:latest
+    stdin_open: true
+    tty: true
+    command: python3 infra/ports/message_queue/run_consumer.py
+    env_file:
+      - ../deploy/.env
+    networks:
+      - poc-network
+networks:
+  poc-network:
+    external: false
+    name: poc-network
