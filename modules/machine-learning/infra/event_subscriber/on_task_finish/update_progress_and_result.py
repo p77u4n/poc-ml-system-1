@@ -3,9 +3,9 @@ from sqlalchemy import update
 from event_broker_base import DomainEvent, SubscriberHandler
 from sqlalchemy.orm import Session
 
-from infra.sqlalchemy.schema import Task
+from infra.sqlalchemy.schema import DMTask
 from models.task import Status
-from models.task_events import get_task_from_event
+from models.task_events_utils import get_task_from_event
 
 
 class UpdateProgressAndResult(SubscriberHandler):
@@ -15,8 +15,8 @@ class UpdateProgressAndResult(SubscriberHandler):
     async def execute(self, event: DomainEvent):
         task = get_task_from_event(event)
         stmt = (
-            update(Task)
-            .where(Task.id == task.id)
+            update(DMTask)
+            .where(DMTask.id == task.id)
             .values(
                 result=task.result.map(lambda r: r.value).value_or("{}"),
                 status=Status.FINISH.value,

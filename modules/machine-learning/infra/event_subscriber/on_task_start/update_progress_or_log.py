@@ -3,9 +3,9 @@ from sqlalchemy import update
 from event_broker_base import DomainEvent, SubscriberHandler
 from sqlalchemy.orm import Session
 
-from infra.sqlalchemy.schema import Task
+from infra.sqlalchemy.schema import DMTask
 from models.task import Status
-from models.task_events import get_task_from_event
+from models.task_events_utils import get_task_from_event
 
 
 class UpdateStartProgressAndLog(SubscriberHandler):
@@ -17,8 +17,8 @@ class UpdateStartProgressAndLog(SubscriberHandler):
         # like push email notification to user, or push a start event to telemetry
         task = get_task_from_event(event)
         stmt = (
-            update(Task)
-            .where(Task.id == task.id)
+            update(DMTask)
+            .where(DMTask.id == task.id)
             .values(
                 status=Status.PROCESSING.value,
             )

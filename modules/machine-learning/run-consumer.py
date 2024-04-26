@@ -31,7 +31,7 @@ def run_consumer(session: Session):
     host = str(get_env("RABBITMQ_HOST") or "/")
     virtual_host = str(get_env("RABBITMQ_POC_VIRTUAL_HOST") or "/")
     credentials = pika.PlainCredentials(username, pwd)
-    print(f"pika: {host}, {virtual_host}")
+    print(f"pika: ${host}, ${virtual_host}")
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
             host=host,
