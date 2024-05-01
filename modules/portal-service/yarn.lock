@@ -1799,6 +1799,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/amqplib@npm:^0.10.5":
+  version: 0.10.5
+  resolution: "@types/amqplib@npm:0.10.5"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/758f1d337e9e65ff6596d002e96b342275386aedfc2e7a2440915543885f3aa3b43995c480f339d25ee780b44af96dba95fd7e792eeaa58d9f84b742f9a98dd8
+  languageName: node
+  linkType: hard
+
 "@types/body-parser@npm:*":
   version: 1.19.5
   resolution: "@types/body-parser@npm:1.19.5"
@@ -2334,7 +2343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"amqplib@npm:^0.10.3":
+"amqplib@npm:^0.10.3, amqplib@npm:^0.10.4":
   version: 0.10.4
   resolution: "amqplib@npm:0.10.4"
   dependencies:
@@ -5657,6 +5666,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.563.0"
     "@grpc/grpc-js": "npm:^1.10.6"
+    "@types/amqplib": "npm:^0.10.5"
     "@types/cors": "npm:^2.8.17"
     "@types/express": "npm:^4.17.13"
     "@types/express-fileupload": "npm:^1"
@@ -5668,6 +5678,7 @@ __metadata:
     "@types/uuid": "npm:^8.3.4"
     "@typescript-eslint/eslint-plugin": "npm:^6.7.0"
     "@typescript-eslint/parser": "npm:^6.7.0"
+    amqplib: "npm:^0.10.4"
     axios: "npm:^0.27.2"
     concurrently: "npm:^7.3.0"
     cors: "npm:^2.8.5"

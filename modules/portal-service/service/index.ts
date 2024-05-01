@@ -9,6 +9,7 @@ import { DMTask } from 'database-typeorm/entities';
 import { v1 } from 'uuid';
 import { UploadFile } from 'core/model/file';
 import { ObjectStoragePort } from 'ports/object-storage.base';
+import { TaskQueue } from 'ports/task-queue/task-queue.base';
 
 // has sideeffect so we use IO here to wrap the side-effect logic (FP principle)
 const dataMapperForTask = (dmTask: DMTask, task: Task) => () => {
@@ -31,6 +32,7 @@ const dataMapperForTask = (dmTask: DMTask, task: Task) => () => {
 export class TypeORMRabbitMqCMDService implements BaseCommandService {
   constructor(
     private datasource: DataSource,
+    private taskQueue: TaskQueue,
     private objectStorageClient: ObjectStoragePort,
   ) {}
 
@@ -53,7 +55,6 @@ export class TypeORMRabbitMqCMDService implements BaseCommandService {
           () => new Error('SAVE_'),
         ),
       ),
-      TE.map((task) => task.id),
     );
   };
   requestCommand(
@@ -70,7 +71,9 @@ export class TypeORMRabbitMqCMDService implements BaseCommandService {
         status: Statuses.PENDING,
       }),
       TE.fromEither,
-      TE.chain(this.createDMTask(this.datasource)),
+      TE.tap(this.createDMTask(this.datasource)),
+      TE.tap(this.taskQueue.putTask),
+      TE.map((task) => task.id),
       // put to rabbimq here
     );
   }
@@ -96,7 +99,9 @@ export class TypeORMRabbitMqCMDService implements BaseCommandService {
         ...initialTask,
         input: { fileURIs: [...uploadFiles] },
       })),
-      TE.chain(this.createDMTask(this.datasource)),
+      TE.tap(this.createDMTask(this.datasource)),
+      TE.tap(this.taskQueue.putTask.bind(this.taskQueue)),
+      TE.map((task) => task.id),
       // put to rabbimq here
     );
   }
