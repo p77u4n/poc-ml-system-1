@@ -1,5 +1,9 @@
 import os
 import sys
+import traceback
+
+from dino_seedwork_be.utils.functional import async_execute
+from returns.future import future_safe
 
 from infra.sqlalchemy.database import SessionLocal
 
@@ -9,7 +13,6 @@ from uuid import UUID
 from dino_seedwork_be import get_env
 import jsonpickle
 import pika
-import time
 
 from returns.io import IOSuccess
 from sqlalchemy import select
@@ -28,6 +31,7 @@ pwd = str(get_env("RABBITMQ_POC_PWD") or "pwd")
 
 
 def run_consumer(session: Session):
+    TASK_QUEUE_NAME = "task-queue"
     host = str(get_env("RABBITMQ_HOST") or "/")
     virtual_host = str(get_env("RABBITMQ_POC_VIRTUAL_HOST") or "/")
     credentials = pika.PlainCredentials(username, pwd)
@@ -45,23 +49,32 @@ def run_consumer(session: Session):
     task_service = TaskUsecases(
         task_repo, env_service_config.max_number_of_concurent_job, event_broker
     )
-    channel.queue_declare(queue="task_queue", durable=True)
+    channel.queue_declare(queue=TASK_QUEUE_NAME, durable=True)
     print(" [*] Waiting for messages. To exit press CTRL+C")
 
+    @future_safe
     async def callback(ch, method, properties, body):
-        stmt = select(count(DMTask.id)).where(DMTask.status == Status.PROCESSING.value)
-        count_current_job = (await session.execute(stmt)).scalars().one()
-        result = await task_service.run_new_task(
-            count_current_job, UUID(jsonpickle.decode(body.decode())["taskId"])
-        )
-        print(f" [x] Received {body.decode()}")
-        match result:
-            case IOSuccess():
-                ch.basic_ack(delivery_tag=method.delivery_tag)
-                print(" [x] Done")
+        try:
+            stmt = select(count(DMTask.id)).where(
+                DMTask.status == Status.PROCESSING.value
+            )
+            print("callback", stmt)
+            count_current_job = (await session.execute(stmt)).scalars().one()
+            print(f" [x] Received {body.decode()} ${count_current_job}")
+            result = await task_service.run_new_task(
+                count_current_job, UUID(jsonpickle.decode(body.decode())["taskId"])
+            )
+            match result:
+                case IOSuccess():
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
+                    print(" [x] Done")
+        except Exception as e:
+            print("exeception ", e, traceback.format_exc())
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue="task_queue", on_message_callback=callback)
+    channel.basic_consume(
+        queue=TASK_QUEUE_NAME, on_message_callback=async_execute(callback)
+    )
 
     channel.start_consuming()
 

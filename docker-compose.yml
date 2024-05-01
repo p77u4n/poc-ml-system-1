@@ -33,15 +33,15 @@ services:
     command: sh /var/lib/rabbitmq/init/init.sh
     networks:
       - poc-network
-  poc-machine-learning-consumer:
-    restart: always
-    image: tuancr/poc-machine-learning-service:latest
-    stdin_open: true
-    tty: true
-    env_file:
-      - ../deploy/.env
-    networks:
-      - poc-network
+  # poc-machine-learning-consumer:
+  #   restart: always
+  #   image: tuancr/poc-machine-learning-service:latest
+  #   stdin_open: true
+  #   tty: true
+  #   env_file:
+  #     - ../deploy/.env
+  #   networks:
+  #     - poc-network
 networks:
   poc-network:
     external: false
