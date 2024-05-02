@@ -22,6 +22,7 @@ const dataMapperForTask = (dmTask: DMTask, task: Task) => () => {
     Opt.getOrElse(() => null),
   );
   dmTask.id = task.id;
+  dmTask.created_at = task.createdAt;
   dmTask.reason = pipe(
     task.failReason,
     Opt.getOrElse(() => null),
@@ -69,10 +70,15 @@ export class TypeORMRabbitMqCMDService implements BaseCommandService {
         command,
         input,
         status: Statuses.PENDING,
+        createdAt: new Date(Date.now()),
       }),
       TE.fromEither,
       TE.tap(this.createDMTask(this.datasource)),
-      TE.tap(this.taskQueue.putTask),
+      TE.tap(
+        this.taskQueue.putTask.bind(
+          this.taskQueue,
+        ) as typeof this.taskQueue.putTask,
+      ),
       TE.map((task) => task.id),
       // put to rabbimq here
     );
@@ -91,6 +97,7 @@ export class TypeORMRabbitMqCMDService implements BaseCommandService {
           fileURIs: [],
         },
         status: Statuses.PENDING,
+        createdAt: new Date(Date.now()),
       }),
       TE.fromEither,
       TE.bindTo('initialTask'),
@@ -100,9 +107,12 @@ export class TypeORMRabbitMqCMDService implements BaseCommandService {
         input: { fileURIs: [...uploadFiles] },
       })),
       TE.tap(this.createDMTask(this.datasource)),
-      TE.tap(this.taskQueue.putTask.bind(this.taskQueue)),
+      TE.tap(
+        this.taskQueue.putTask.bind(
+          this.taskQueue,
+        ) as typeof this.taskQueue.putTask,
+      ),
       TE.map((task) => task.id),
-      // put to rabbimq here
     );
   }
 }

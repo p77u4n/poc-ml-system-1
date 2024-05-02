@@ -5,6 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   Column,
+  CreateDateColumn,
 } from 'typeorm';
 
 @Entity('users')
@@ -64,4 +65,7 @@ export class DMTask {
     nullable: true,
   })
   reason: string;
+
+  @CreateDateColumn()
+  created_at: Date;
 }

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -13,6 +13,7 @@ class DMTask(Base):
     command = Column(String(16))
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))
     input = Column(String)
+    created_at = Column(DateTime)
 
 
 class DMUser(Base):

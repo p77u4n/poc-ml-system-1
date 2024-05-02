@@ -61,6 +61,7 @@ export interface Task {
   id: UUID;
   userId: UUID;
   status: Statuses;
+  createdAt: Date;
   result: Option.Option<string>;
   failReason: Option.Option<string>;
   input: FileInput | PredictInput;
@@ -75,6 +76,7 @@ export const parseTask = (params: {
   result?: string;
   failReason?: string;
   input: Record<string, any>;
+  createdAt: Date;
 }): Either.Either<Error, Task> => {
   return match([params.userId, params.id, params.command, params.status])
     .with(
@@ -100,6 +102,7 @@ export const parseTask = (params: {
                 failReason: Option.fromNullable(params.failReason),
                 input,
                 command: command,
+                createdAt: params.createdAt,
               } as Task),
           )
           .otherwise(() => Either.left(new Error('COMMAND_INPUT_NOT_MATCH')));

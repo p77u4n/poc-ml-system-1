@@ -10,9 +10,17 @@ function App() {
     process.env.REACT_APP_API_ENDPOINT || "http://localhost:3003",
     "bf7ab410-03ad-11ef-a277-c31c49e4e709",
   );
+  useEffect(() => {
+    const tm = setTimeout(fetchMyCommands, 5000);
+    return () => {
+      clearTimeout(tm);
+    };
+  }, [fetchMyCommands]);
   return (
-    <div className="App">
-      <CanvasRectangle />
+    <div className="App flex flex-col content-center justify-center flex-wrap">
+      <div className="m-auto pb-10 pt-10">
+        <CanvasRectangle />
+      </div>
       <button onClick={fetchMyCommands}>Get My Commands</button>
       <TaskTable tasks={myCommands} />
     </div>

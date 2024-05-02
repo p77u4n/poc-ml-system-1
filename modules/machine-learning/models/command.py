@@ -63,10 +63,10 @@ def parse_predict_input_from_json(json_str: str) -> ResultE[PredictInput]:
         # has enough data we need. If it doesn't, the KeyError will be returned and
         # caught by the safe decorator, safely wrapped in a Result monad.
         return {
-            "top_left_x": vjson["top_left_x"],
-            "top_left_y": vjson["top_left_y"],
-            "bottom_right_x": vjson["bottom_right_x"],
-            "bottom_right_y": vjson["bottom_right_y"],
+            "top_left_x": vjson["topLeftX"],
+            "top_left_y": vjson["topLeftY"],
+            "bottom_right_x": vjson["bottomRightX"],
+            "bottom_right_y": vjson["bottomRightY"],
         }
 
     return (
@@ -89,6 +89,6 @@ def parse_otherwise_input(json_str: str) -> ResultE[OtherwiseInput]:
     @safe
     def parse_file_from_json(json_str: str):
         vjson = json.decode(json_str) or {}
-        return vjson["file_url"]
+        return vjson["fileURIs"]
 
     return parse_file_from_json(json_str).map(OtherwiseInput)

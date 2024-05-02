@@ -2,6 +2,7 @@ from dino_seedwork_be import get_env
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 
 def get_posgres_uri() -> str:
@@ -15,7 +16,9 @@ def get_posgres_uri() -> str:
 
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
-engine = create_async_engine(get_posgres_uri(), connect_args={})
+engine = create_async_engine(get_posgres_uri(), connect_args={}, poolclass=NullPool)
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
 )
+
+session = SessionLocal()

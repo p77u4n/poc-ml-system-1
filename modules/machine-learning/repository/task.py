@@ -10,3 +10,7 @@ class TaskRepository(ABC):
     @abstractmethod
     def get_by_id(self, id: UUID) -> FutureResultE[Task]:
         pass
+
+    @abstractmethod
+    def save(self, task: Task) -> FutureResultE:
+        pass

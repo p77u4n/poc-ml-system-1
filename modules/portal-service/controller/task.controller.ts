@@ -34,8 +34,9 @@ taskRoute.post('/command/file', async (req, res) => {
     (err, data) => {
       if (err) {
         res.status(400).send(err.details);
+      } else {
+        res.status(200).send('OK');
       }
-      res.status(200).send('OK');
     },
   );
 });
@@ -50,8 +51,9 @@ taskRoute.post('/command/predict', async (req, res) => {
     (err, data) => {
       if (err) {
         res.status(400).send(err.details);
+      } else {
+        res.status(200).send('OK');
       }
-      res.status(200).send('OK');
     },
   );
 });
@@ -62,8 +64,9 @@ taskRoute.get('/command/:id/status', async (req, res) => {
     .findOneBy({ id: req.params.id });
   if (!task) {
     res.status(404).send('NOT FOUND');
+  } else {
+    res.status(200).send({ status: task.status });
   }
-  res.status(200).send({ status: task.status });
 });
 
 taskRoute.get('/command', async (req, res) => {

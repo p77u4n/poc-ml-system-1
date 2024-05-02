@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass
 from enum import Enum
 import uuid
@@ -155,6 +156,7 @@ async def running_task(task: Task):
     # machine learning algorithm main process be put at here
     is_failed = bool(random.randint(0, 1))
     updated_task = clone_task(task)
+    print("running with task ", task)
     match is_failed:
         case True:
             updated_task.result = Maybe.from_value(
@@ -167,7 +169,7 @@ async def running_task(task: Task):
             ]
         case False:
             updated_task.fail_reason = Maybe.from_value(
-                parse_reason("FAILED").unwrap()
+                parse_reason("FAILED BY RANDOM").unwrap()
             )  # panic here true
             updated_task.status = Status.FAILED
             return [
