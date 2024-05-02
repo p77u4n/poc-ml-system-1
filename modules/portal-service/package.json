@@ -7,10 +7,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "npx tsc --project ./tsconfig.json --outdir ./dist/cjs & cp -r ./ports/grpc/protos ./dist/cjs/ports/grpc",
-    "express-rest:start": "NODE_PATH=dist/cjs/ node dist/cjs/app.js",
+    "build": "npx tsc --project ./tsconfig.json --outdir ./dist/cjs && cp -r ./ports/grpc/protos ./dist/cjs/ports/grpc",
+    "service:start": "NODE_PATH=dist/cjs/ node dist/cjs/app.js",
     "express-rest:dev": "concurrently \"npx tsc --project ./tsconfig.json --outdir dist/cjs --watch\" \"NODE_PATH=dist/cjs/ nodemon -q dist/cjs/app.js\"",
-    "grpc:dev": "concurrently \"npx tsc --project ./tsconfig.json --outdir dist/cjs --watch\" \"NODE_PATH=dist/cjs/ nodemon -q dist/cjs/app.js\""
+    "service:dev": "concurrently \"npx tsc --project ./tsconfig.json --outdir dist/cjs --watch\" \"NODE_PATH=dist/cjs/ nodemon -q dist/cjs/app.js\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.563.0",

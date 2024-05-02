@@ -14,9 +14,13 @@ def get_posgres_uri() -> str:
     return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db_name}"
 
 
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+SQLALCHEMY_DATABASE_URL = get_posgres_uri()
 
-engine = create_async_engine(get_posgres_uri(), connect_args={}, poolclass=NullPool)
+print("connect sqlalchemy ", SQLALCHEMY_DATABASE_URL)
+
+engine = create_async_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={}, poolclass=NullPool
+)
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
 )

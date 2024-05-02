@@ -1,24 +1,33 @@
 version: '3.3'
 
 services:
-  # node-service-grpc:
-  #   image: tuancr/poc-node-service:latest
-  #   stdin_open: true
-  #   tty: true
-  #   env_file:
-  #     - ./deploy/.node-gateway.env
-  #   networks:
-  #     - poc-network 
-  #   restart: always
-  # node-service-express:
-  #   image: tuancr/poc-node-service:latest
-  #   stdin_open: true
-  #   tty: true
-  #   env_file:
-  #     - ./deploy/.node-gateway.env
-  #   networks:
-  #     - poc-network 
-  #   restart: always
+  portal-service:
+    image: tuancr/poc-machine-portal-node:latest
+    stdin_open: true
+    tty: true
+    env_file:
+      - ./deploy/.node-gateway.env
+    networks:
+      - poc-network 
+    restart: always
+    ports:
+      - 3005:3003
+    depends_on:
+      - mock_postgres
+      - rabbitmq
+  poc-web-app:
+    image: tuancr/poc-machine-web-app:latest
+    stdin_open: true
+    tty: true
+    env_file:
+      - ./deploy/.web-app.env
+    networks:
+      - poc-network 
+    ports:
+      - 3004:3000
+    depends_on:
+      - portal-service
+    restart: always
   rabbitmq:
     image: rabbitmq:3-management
     restart: always
@@ -33,15 +42,36 @@ services:
     command: sh /var/lib/rabbitmq/init/init.sh
     networks:
       - poc-network
-  # poc-machine-learning-consumer:
-  #   restart: always
-  #   image: tuancr/poc-machine-learning-service:latest
-  #   stdin_open: true
-  #   tty: true
-  #   env_file:
-  #     - ../deploy/.env
-  #   networks:
-  #     - poc-network
+  poc-machine-learning-consumer:
+    restart: always
+    image: tuancr/poc-machine-learning-service:latest
+    command: "sh -c 'alembic upgrade head && python run-consumer.py'"
+    stdin_open: true
+    tty: true
+    env_file:
+      - ./deploy/.env
+    depends_on:
+      - mock_postgres
+      - rabbitmq
+    networks:
+      - poc-network
+  mock_postgres:
+    container_name: mock_postgres 
+    image: postgres
+    env_file:
+      - ./deploy/postgres/.example.env
+    volumes:
+      - ./deploy/postgres/data:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - poc-network 
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', '${POSTGRES_USER}', '-d', '${POSTGRES_PASSWORD}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 networks:
   poc-network:
     external: false

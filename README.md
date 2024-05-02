@@ -1,5 +1,14 @@
 # Simple POC for Educational Purpose
 
+# Running for Test
+
+Requirement: docker, docker compose on your machine
+
+```
+docker compose up
+```
+The node service will be available, be listening to port 3005 in your local machine
+The web app will be accessible via port 3004, you can see it in your browser
 # Domain
 
 Machine Learning Processing

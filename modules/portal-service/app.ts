@@ -56,7 +56,10 @@ const start = async () => {
   pipe(
     registry,
     Either.match(
-      (e) => console.error('REGISTRY_CREATING_FAILED: ', e),
+      (e) => {
+        console.error('REGISTRY_CREATING_FAILED: ', e);
+        throw e;
+      },
       (reg) => startService(reg),
     ),
   );

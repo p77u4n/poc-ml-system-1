@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 
+from dino_seedwork_be import get_env
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -14,6 +15,15 @@ config = context.config
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+host = get_env("DB_HOST")
+user = get_env("DB_USER")
+pwd = get_env("DB_PASSWORD")
+db = get_env("DB_NAME")
+port = get_env("DB_PORT")
+db_uri = f"postgresql://{user}:{pwd}@{host}:{port}/{db}"
+print("db uri alembic", db_uri)
+config.set_main_option("sqlalchemy.url", db_uri)
 
 # add your model's MetaData object here
 # for 'autogenerate' support

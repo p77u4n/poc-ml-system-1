@@ -2,7 +2,9 @@ __pycache__
 **/*/node_modules
 **/*/dist
 **/*.env*
+!deploy/*.env*
 deploy/rabbitmq/data
+deploy/postgres/data
 
 **/*/build
 
@@ -18,3 +20,4 @@ deploy/rabbitmq/data
 # Documentation here: https://yarnpkg.com/features/caching#zero-installs
 #!.yarn/cache
 .**/*/pnp.*
+!modules/webapp/.build.env
