@@ -9,6 +9,24 @@ docker compose up
 ```
 The node service will be available, be listening to port 3005 in your local machine
 The web app will be accessible via port 3004, you can see it in your browser
+
+## Building
+
+### Machine Learning service
+```
+docker build -t tuancr/poc-machine-learning-service:latest -f Dockerfile .
+```
+### Express + RGPC service
+```
+docker build -t tuancr/poc-machine-portal-node:latest -f Dockerfile ./modules/portal-service
+```
+### Webapp service
+
+```
+docker build -t tuancr/poc-machine-web-app:latest -f Dockerfile ./modules/webapp
+```
+
+
 # Domain
 
 Machine Learning Processing
