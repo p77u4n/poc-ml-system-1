@@ -30,7 +30,7 @@ Our solution for our system avaibility is decoupling two service using asynchron
 
 ## Service
 
-![system layout](https://pub-655b129b1b4f44dda33a7f1a9bf4d857.r2.dev/system-layout.png "system layout")
+![system layout](https://pub-655b129b1b4f44dda33a7f1a9bf4d857.r2.dev/Untitled-2023-11-24-1104.png "system layout")
 
 ### The Machine learning service
 
