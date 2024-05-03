@@ -50,14 +50,16 @@ Machine Learning Processing system
 # Solution
 
 We need at lease two service that do two unrelated concern
-    * For interacting, as a direct interface of our system to the end user
-    * For running the machine learning job
+
+1. For interacting, as a direct interface of our system to the end user
+2. For running the machine learning job
 
 Our solution for our system avaibility is **decoupling** two service using asynchronous communication method, message-queue communicating pattern.
 
 Because we have two problem, two concerns that have so much gap caused by its difference in the kind of tasks that they handle
-    * The user interacting problem/concern - almost contains running non-heavy tasks, unintensive tasks, and we need avaibility, short-delay timed facing with user to make our user experience fluent, uninterupted
-    * The machine learning task - involve doing heavy machine learning task even with limitation of hardware resource -> easy to failed, need to be appropriate for horizontal scaling -> to make our whole system fault tolerance
+
+1. The user interacting problem/concern - almost contains running non-heavy tasks, unintensive tasks, and we need avaibility, short-delay timed facing with user to make our user experience fluent, uninterupted
+2. The machine learning task - involve doing heavy machine learning task even with limitation of hardware resource -> easy to failed, need to be appropriate for horizontal scaling -> to make our whole system fault tolerance
 
 ## Service
 
